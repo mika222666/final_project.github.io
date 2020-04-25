@@ -1,0 +1,36 @@
+---
+title: "Final Project Preliminary"
+output: html_notebook
+---
+
+#### Guiding Question
+Has the various circumstances have relation with the chance and kinds of a crime happening? (e.g. time of the day, temperature of the day, area etc.)
+
+
+
+#### Become acquainted with your data sources
+* Found the dataset on https://data.cityofchicago.org/Public-Safety/Crimes-2001-to-present/ijzp-q8t2
+* The dataset is published by the Chicago Police Department
+* They are collected and updated everyday since the police deparment always record the new crimes that happened
+* Each case represents a crime that happened, including the detailed information about it, there are over 7 million cases are available in the dataset
+* Variables like "Date", "Location", "Primary type", "Description" could be highly used.
+
+
+
+#### Explore intuition related to the research question
+```{r}
+library(readr)
+webURL <- "https://data.cityofchicago.org/api/views/ijzp-q8t2/rows.csv?accessType=DOWNLOAD"
+MyDataTable <- read_csv(webURL)
+```
+**The full dataset is 1.55 Gb huge, and I am afraid I don't have time to do the sampling right now, the basic idea now is to show a scatter graph which display each case as a point as the x row is timeline**
+
+
+
+
+
+
+
+#### TWO Data Sources
+* The primary source is the dataset from the Chicago Police Department
+* The secondary I was planning on collecting weather data ot economic data and then combine it with the primary data for further inspection

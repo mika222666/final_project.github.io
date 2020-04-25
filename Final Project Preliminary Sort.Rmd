@@ -1,0 +1,94 @@
+---
+title: "File"
+output: html_notebook
+---
+
+```{r include=FALSE}
+library(DataComputing)
+library(tidyverse)
+library(readr)
+library(mosaic)
+library(lubridate)
+library(plotly)
+```
+
+
+```{r}
+Crimes_2001_to_present <- read_csv("Crimes_-_2001_to_present.csv", 
+     col_types = cols(Latitude = col_character(), 
+        Location = col_character(), Longitude = col_character(), 
+        `X Coordinate` = col_character(), 
+        `Y Coordinate` = col_character()))
+```
+
+
+```{r}
+Crimes_2001_to_present
+```
+
+```{r}
+Crimes <- Crimes_2001_to_present
+Crimes08 <- Crimes %>% filter(Year=="2008")
+Crimes08
+```
+
+```{r}
+Crimes08Type <- Crimes08 %>% group_by(`Primary Type`, `Location Description`) %>% summarise(count = n()) %>% rename(PriType=`Primary Type`, LocDes = `Location Description`)
+Crimes08Type
+```
+
+```{r}
+Graph08 <- ggplot(data=Crimes08Type,aes(x=reorder(PriType,count),y=count ,fill=LocDes))+geom_bar(stat='identity',position='stack', width=.9)+theme(axis.text.x = element_text(angle = 45, hjust = 1))+scale_color_grey()
+ggplotly(Graph08, height=1000, width=3000)
+```
+
+```{r}
+EachYear <- Crimes %>% filter(Year!=2020) %>% group_by(Year,`Primary Type`) %>% summarise(count=n()) %>% arrange(`Primary Type`) %>% rename(PriType=`Primary Type`)
+EachYear
+```
+
+```{r}
+EachYearGraph <- ggplot(data=EachYear,aes(x=Year,y=count,fill=PriType))+geom_bar(stat='identity',position='stack', width=.9)+theme(axis.text.x = element_text(angle = 45, hjust = 1))+scale_color_grey()
+ggplotly(EachYearGraph, height=1000, width=1500)
+```
+
+```{r include=FALSE}
+devtools::install_github("ropensci/rnoaa")
+```
+
+```{r include=FALSE}
+library("rnoaa")
+```
+```{r}
+options(noaakey = "dZHCRTVsEdwFQEzgovApkrhRWtwHWjjJ")
+ncdc(datasetid = 'GHCNDMS', stationid = 'GHCND:USW00014819', startdate = '2010-01-01',
+   enddate = '2019-12-31')
+```
+
+```{r}
+dat <- ghcnd(stationid = "USW00014819")
+dattemp <- dat %>%
+  filter(element == "TMAX", year >= 2000)%>% select(VALUE1,year,month)%>%group_by(VALUE1=VALUE1/10)%>%group_by(AvgTemp=VALUE1)%>%select(year, month, AvgTemp)
+dattemp
+```
+```{r}
+Crimes08 <- Crimes08 %>% mutate(Date = lubridate:: dmy_hms(Date))%>%arrange(Date)
+Crimes08
+```
+
+```{r}
+Crimes08 <- Crimes08 %>% group_by(`Primary Type`,month=floor_date(Date, "month")) %>% summarise(count = n()) %>% rename(PriType=`Primary Type`)
+Crimes08
+```
+```{r}
+Crimes08Theft <- Crimes08 %>% filter(PriType=="THEFT")
+Crimes08Theft
+```
+
+
+```{r}
+ggplot( data = dattemp, aes(x = AvgTemp)) + geom_density(adjust = 0.4) + labs(title = "")
+```
+
+
+
